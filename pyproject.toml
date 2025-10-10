@@ -8,7 +8,6 @@ authors = [
 ]
 dependencies = [
     # Install mcp-weather from GitHub to get the core infrastructure
-    # Replace 'geosp' with your actual GitHub username
     "mcp-weather @ git+https://github.com/geosp/mcp-weather.git",
     # Web scraping and HTTP client
     "httpx>=0.25.0",
