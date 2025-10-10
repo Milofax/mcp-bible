@@ -31,7 +31,26 @@ The Bible MCP Server provides:
 
 ### Prerequisites
 - Python 3.10+
-- `uv` package manager (or `pip`)
+- `uv` package manager
+
+#### Installing uv
+
+**On Linux/macOS:**
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+**On Windows:**
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+Alternatively, you can install uv using pip:
+```bash
+pip install uv
+```
+
+After installation, restart your terminal or run `source ~/.bashrc` (Linux/macOS) or restart your command prompt (Windows).
 
 ### Step 1: Install Dependencies
 
@@ -50,7 +69,7 @@ uv sync
 cp .env.example .env
 
 # Edit .env with your settings
-nano .env
+vi .env
 ```
 
 ## Usage
@@ -63,7 +82,7 @@ export MCP_TRANSPORT=stdio
 export MCP_ONLY=true
 
 # Run the server
-python -m mcp_bible.server
+uv run python -m mcp_bible.server
 ```
 
 ### Run in HTTP Mode with REST API
@@ -75,7 +94,7 @@ export MCP_ONLY=false
 export MCP_PORT=3000
 
 # Run the server
-python -m mcp_bible.server
+uv run python -m mcp_bible.server
 ```
 
 The server will start at `http://localhost:3000` with:
