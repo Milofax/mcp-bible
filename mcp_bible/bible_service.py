@@ -43,7 +43,7 @@ class BibleService:
         Fetch a Bible passage from BibleGateway.
 
         Args:
-            passage: Bible reference (e.g., "John 3:16", "Romans 8")
+            passage: Bible reference(s) (e.g., "John 3:16", "Romans 8", or "John 3:16; Romans 8:28-30")
             version: Bible translation version (e.g., "ESV", "NIV", "KJV")
 
         Returns:
@@ -60,38 +60,70 @@ class BibleService:
             result = await service.fetch_passage("John 3:16", "ESV")
             if result["success"]:
                 print(result["text"])
+
+            # Multiple passages
+            result = await service.fetch_passage("John 3:16; Romans 8:28", "ESV")
         """
         logger.info(
             f"Fetching Bible passage: {passage} ({version})"
         )
 
         try:
-            # Fetch the page
-            html = await self._fetch_html(passage, version)
+            # Split multiple passages on semicolon
+            passages = [p.strip() for p in passage.split(";") if p.strip()]
 
-            # Parse the passage
-            text = self._parse_passage(html)
+            if len(passages) > 1:
+                # Fetch multiple passages
+                results = []
+                for single_passage in passages:
+                    html = await self._fetch_html(single_passage, version)
+                    text = self._parse_passage(html)
+                    if text:
+                        results.append(f"{single_passage}\n{text}")
+                    else:
+                        results.append(f"{single_passage}\n[Could not parse passage text]")
 
-            if not text:
+                combined_text = "\n\n".join(results)
+
+                logger.info(
+                    f"Successfully fetched {len(passages)} passages: {passage} ({version}) - {len(combined_text)} characters"
+                )
+
                 return {
-                    "success": False,
+                    "success": True,
                     "passage": passage,
                     "version": version,
-                    "text": None,
-                    "error": "Could not parse passage text",
+                    "text": combined_text,
+                    "error": None,
                 }
+            else:
+                # Single passage (existing logic)
+                # Fetch the page
+                html = await self._fetch_html(passage, version)
 
-            logger.info(
-                f"Successfully fetched passage: {passage} ({version}) - {len(text)} characters"
-            )
+                # Parse the passage
+                text = self._parse_passage(html)
 
-            return {
-                "success": True,
-                "passage": passage,
-                "version": version,
-                "text": text,
-                "error": None,
-            }
+                if not text:
+                    return {
+                        "success": False,
+                        "passage": passage,
+                        "version": version,
+                        "text": None,
+                        "error": "Could not parse passage text",
+                    }
+
+                logger.info(
+                    f"Successfully fetched passage: {passage} ({version}) - {len(text)} characters"
+                )
+
+                return {
+                    "success": True,
+                    "passage": passage,
+                    "version": version,
+                    "text": text,
+                    "error": None,
+                }
 
         except Exception as e:
             logger.error(

@@ -9,7 +9,7 @@ This server enables AI assistants to access Bible passages from various translat
 The Bible MCP Server provides:
 
 ### MCP Tools (for AI assistants)
-- `get_passage(passage, version)` - Retrieve Bible passages.
+- `get_passage(passage, version)` - Retrieve Bible passages. Supports multiple passages separated by semicolons (e.g., "John 3:16; Romans 8:28").
 
 ### REST API Endpoints
 - `GET /health` - Health check

@@ -36,16 +36,19 @@ def register_tool(mcp: FastMCP, bible_service: BibleService) -> None:
         - "What does Romans 8 say?"
         - "Read Psalm 23 in NIV"
         - "Get the text of Genesis 1"
+        - "Show me John 3:16 and Romans 8:28"
 
         Features:
         - Support for 8+ Bible translations
         - Automatic HTML parsing and cleaning
         - Error handling for invalid passages
         - Footnotes and cross-references removed
+        - Multiple passages supported (separate with semicolons)
 
         Args:
-            passage (str): Bible reference to retrieve
+            passage (str): Bible reference(s) to retrieve
                 Examples: "John 3:16", "Romans 8:28-30", "Psalm 23", "Genesis 1:1-10"
+                Multiple: "John 3:16; Romans 8:28; Psalm 23:1-6"
 
             version (str, optional): Bible translation version
                 Default: "ESV" (English Standard Version)
