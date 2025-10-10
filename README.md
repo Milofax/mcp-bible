@@ -9,7 +9,7 @@ This server enables AI assistants to access Bible passages from various translat
 The Bible MCP Server provides:
 
 ### MCP Tools (for AI assistants)
-- `get_passage(passage, version)` - Retrieve Bible passages from BibleGateway.com
+- `get_passage(passage, version)` - Retrieve Bible passages.
 
 ### REST API Endpoints
 - `GET /health` - Health check
@@ -298,7 +298,7 @@ uv sync  # Installs from pyproject.toml
 
 ## Next Steps
 
-- Add real Bible API integration (BibleGateway, ESV API, etc.)
+- Add real Bible API integration
 - Add more Bible versions
 - Implement passage search
 - Add daily verses
