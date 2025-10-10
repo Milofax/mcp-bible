@@ -39,6 +39,8 @@ docker-compose -f docker-compose.rest.yml up --build -d
 
 ### Production Mode (Uses published images)
 
+**Note**: Production setups require the `mcp-bible` package to be published to PyPI. The Docker image uses `uvx mcp-bible` which downloads and runs the published package.
+
 #### MCP-only Mode
 For production deployment using published images:
 
@@ -111,14 +113,14 @@ These setups use pre-built images from GitHub Container Registry for faster depl
 
 #### MCP-only Mode (docker-compose.prod.yml)
 The service is configured to:
-- Use published image: `ghcr.io/geosp/mcp-bible:latest`
+- Use published image: `ghcr.io/geosp/mcp-bible:main`
 - Expose port 3000 for MCP communication
 - Run in Streaming HTTP mode for pure MCP protocol communication
 - No source code mounting required
 
 #### REST Mode (docker-compose.prod.rest.yml)
 The service is configured to:
-- Use published image: `ghcr.io/geosp/mcp-bible:latest`
+- Use published image: `ghcr.io/geosp/mcp-bible:main`
 - Expose port 3000 for MCP communication
 - Run with full REST API + MCP protocol support
 - No source code mounting required
@@ -144,6 +146,7 @@ docker-compose -f docker-compose.rest.yml restart mcp-bible
 - The container uses uv for Python package management, which handles dependencies automatically
 - **MCP-only mode**: When `MCP_ONLY=true`, REST API endpoints like `/health` are disabled. Only the `/mcp` endpoint is available for MCP protocol communication
 - **REST mode**: Full API access available including `/health`, `/docs`, and `/mcp` endpoints
+- **Production mode**: Requires the `mcp-bible` package to be published to PyPI for `uvx` to download and run it
 
 ## Environment Variables
 
