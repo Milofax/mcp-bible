@@ -7,5 +7,5 @@ services:
       - "3000:3000"
     environment:
       - MCP_ONLY=true
-    command: ["mcp-bible"]
+    command: ["mcp-bible@git+https://github.com/geosp/mcp-bible.git"]
     restart: unless-stopped

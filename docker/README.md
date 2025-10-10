@@ -39,7 +39,7 @@ docker-compose -f docker-compose.rest.yml up --build -d
 
 ### Production Mode (Uses published images)
 
-**Note**: Production setups require the `mcp-bible` package to be published to PyPI. The Docker image uses `uvx mcp-bible` which downloads and runs the published package.
+**Note**: Production setups use the published Docker image from GHCR and run the package directly from the GitHub repository using `uvx mcp-bible@git+https://github.com/geosp/mcp-bible.git`.
 
 #### MCP-only Mode
 For production deployment using published images:
@@ -146,7 +146,7 @@ docker-compose -f docker-compose.rest.yml restart mcp-bible
 - The container uses uv for Python package management, which handles dependencies automatically
 - **MCP-only mode**: When `MCP_ONLY=true`, REST API endpoints like `/health` are disabled. Only the `/mcp` endpoint is available for MCP protocol communication
 - **REST mode**: Full API access available including `/health`, `/docs`, and `/mcp` endpoints
-- **Production mode**: Requires the `mcp-bible` package to be published to PyPI for `uvx` to download and run it
+- **Production mode**: Uses `uvx` to run the package directly from the GitHub repository (`git+https://github.com/geosp/mcp-bible.git`)
 
 ## Environment Variables
 
@@ -175,15 +175,25 @@ lxc.mount.auto = proc:rw sys:rw
 Use `sudo` with podman-compose commands:
 
 ```bash
-# MCP-only mode
+# Development MCP-only mode
 sudo podman-compose up --build -d
 sudo podman-compose logs -f mcp-bible
 sudo podman-compose down
 
-# REST mode
+# Development REST mode
 sudo podman-compose -f docker-compose.rest.yml up --build -d
 sudo podman-compose -f docker-compose.rest.yml logs -f mcp-bible
 sudo podman-compose -f docker-compose.rest.yml down
+
+# Production MCP-only mode
+sudo podman-compose -f docker-compose.prod.yml up -d
+sudo podman-compose -f docker-compose.prod.yml logs -f mcp-bible
+sudo podman-compose -f docker-compose.prod.yml down
+
+# Production REST mode
+sudo podman-compose -f docker-compose.prod.rest.yml up -d
+sudo podman-compose -f docker-compose.prod.rest.yml logs -f mcp-bible
+sudo podman-compose -f docker-compose.prod.rest.yml down
 ```
 
 If you encounter container build failures in LXC, the privileged configuration above should resolve the `/proc` mount permission errors.
