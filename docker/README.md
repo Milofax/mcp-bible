@@ -197,3 +197,67 @@ sudo podman-compose -f docker-compose.prod.rest.yml down
 ```
 
 If you encounter container build failures in LXC, the privileged configuration above should resolve the `/proc` mount permission errors.
+
+## Claude Desktop Integration
+
+To use the MCP Bible server with Claude Desktop, you'll need to install and configure [MCP Bridge](https://github.com/geosp/mcp-bridge), which allows Claude Desktop to connect to remote MCP servers over HTTP/SSE.
+
+### Prerequisites
+
+- Claude Desktop installed
+- MCP Bridge installed from GitHub:
+  ```bash
+  uv pip install git+https://github.com/geosp/mcp-bridge.git
+  ```
+
+### Setup Steps
+
+1. **Start your MCP Bible server** using one of the Docker configurations above
+2. **Initialize MCP Bridge configuration**:
+   ```bash
+   mcp-bridge init --name bible
+   ```
+3. **Edit the configuration file** at `~/.config/mcp-bridge/bible.json`:
+   ```json
+   {
+     "url": "http://localhost:3000/mcp"
+   }
+   ```
+   Adjust the URL if your server is running on a different host/port.
+
+4. **Configure Claude Desktop** by editing the configuration file:
+
+   - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+   - **Windows**: `%APPDATA%/Claude/claude_desktop_config.json`
+   - **Linux**: `~/.config/Claude/claude_desktop_config.json`
+
+   Add the MCP server configuration:
+   ```json
+   {
+     "mcpServers": {
+       "bible": {
+         "command": "mcp-bridge",
+         "args": ["--config", "bible.json"]
+       }
+     }
+   }
+   ```
+
+5. **Restart Claude Desktop**
+
+### Testing the Integration
+
+You can test the bridge connection before configuring Claude Desktop:
+
+```bash
+echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}}}' | mcp-bridge --config bible.json
+```
+
+This should return a JSON response from your MCP Bible server.
+
+### Troubleshooting
+
+- **Bridge not connecting**: Verify your MCP Bible server is running and accessible at the configured URL
+- **Claude Desktop not finding tools**: Check that the bridge configuration is correct and Claude Desktop has been restarted
+
+Once configured, Claude Desktop will have access to all Bible passage retrieval tools provided by your MCP server!
