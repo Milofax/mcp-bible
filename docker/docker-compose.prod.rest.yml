@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  mcp-bible:
+    image: ghcr.io/geosp/mcp-bible:latest
+    ports:
+      - "3000:3000"
+    command: ["mcp-bible"]
+    restart: unless-stopped
