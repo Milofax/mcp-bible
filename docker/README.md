@@ -11,6 +11,7 @@ This directory contains Docker Compose configurations to run the MCP Bible serve
 ### Production Setups (use published images)
 - **MCP-only Mode** (`docker-compose.prod.yml`): Uses published GHCR image for MCP-only mode
 - **REST Mode** (`docker-compose.prod.rest.yml`): Uses published GHCR image for REST mode
+- **Versioned Releases**: Use semantic version tags like `v1.0.0` for stable releases (e.g., `docker-compose.prod.v1.0.0.yml`)
 
 ## Prerequisites
 
@@ -57,6 +58,14 @@ cd docker
 docker-compose -f docker-compose.prod.rest.yml up -d
 ```
 
+#### Versioned Releases (Recommended for Production)
+For stable production deployments using specific versions:
+
+```bash
+cd docker
+docker-compose -f docker-compose.prod.v1.0.0.yml up -d
+```
+
 ### Check Status
 ```bash
 # Development MCP-only
@@ -85,6 +94,9 @@ docker-compose -f docker-compose.prod.yml down
 
 # Production REST
 docker-compose -f docker-compose.prod.rest.yml down
+
+# Production versioned
+docker-compose -f docker-compose.prod.v1.0.0.yml down
 ```
 
 ## Configuration
@@ -147,6 +159,7 @@ docker-compose -f docker-compose.rest.yml restart mcp-bible
 - **MCP-only mode**: When `MCP_ONLY=true`, REST API endpoints like `/health` are disabled. Only the `/mcp` endpoint is available for MCP protocol communication
 - **REST mode**: Full API access available including `/health`, `/docs`, and `/mcp` endpoints
 - **Production mode**: Uses `uvx` to run the package directly from the GitHub repository (`git+https://github.com/geosp/mcp-bible.git`)
+- **Versioned deployments**: Use specific version tags (e.g., `:v1.0.0`) for stable, immutable deployments instead of `:main` for bleeding-edge
 
 ## Environment Variables
 
@@ -194,6 +207,11 @@ sudo podman-compose -f docker-compose.prod.yml down
 sudo podman-compose -f docker-compose.prod.rest.yml up -d
 sudo podman-compose -f docker-compose.prod.rest.yml logs -f mcp-bible
 sudo podman-compose -f docker-compose.prod.rest.yml down
+
+# Production versioned mode
+sudo podman-compose -f docker-compose.prod.v1.0.0.yml up -d
+sudo podman-compose -f docker-compose.prod.v1.0.0.yml logs -f mcp-bible
+sudo podman-compose -f docker-compose.prod.v1.0.0.yml down
 ```
 
 If you encounter container build failures in LXC, the privileged configuration above should resolve the `/proc` mount permission errors.
@@ -261,3 +279,58 @@ This should return a JSON response from your MCP Bible server.
 - **Claude Desktop not finding tools**: Check that the bridge configuration is correct and Claude Desktop has been restarted
 
 Once configured, Claude Desktop will have access to all Bible passage retrieval tools provided by your MCP server!
+
+## Semantic Versioning & Releases
+
+The project uses [semantic versioning](https://semver.org/) for stable releases. Version tags follow the format `vMAJOR.MINOR.PATCH` (e.g., `v1.0.0`).
+
+### Release Process
+
+1. **Create a Git tag** for the release:
+   ```bash
+   git tag v1.0.0
+   git push origin v1.0.0
+   ```
+
+2. **GitHub Actions automatically**:
+   - Builds and pushes Docker images with version tags
+   - Creates multiple tags: `v1.0.0`, `v1.0`, `v1`, `latest`
+
+3. **Use versioned images** in production:
+   ```bash
+   # Instead of :main, use specific version
+   docker-compose -f docker-compose.prod.v1.0.0.yml up -d
+   ```
+
+### Available Version Tags
+
+When you create a semantic version tag like `v1.2.3`, the following Docker image tags are created:
+- `ghcr.io/geosp/mcp-bible:v1.2.3` (full version)
+- `ghcr.io/geosp/mcp-bible:v1.2` (major.minor)
+- `ghcr.io/geosp/mcp-bible:v1` (major only)
+- `ghcr.io/geosp/mcp-bible:latest` (latest release)
+
+### Creating Versioned Compose Files
+
+To create a versioned compose file for any release:
+
+```bash
+# Replace VERSION with your desired version (e.g., v1.0.0)
+VERSION=v1.0.0
+
+# Copy the template
+cp docker-compose.prod.yml docker-compose.prod.${VERSION}.yml
+
+# Edit the image tag (change :main to :VERSION)
+# You can do this manually or use sed:
+sed -i "s|ghcr.io/geosp/mcp-bible:main|ghcr.io/geosp/mcp-bible:${VERSION}|g" docker-compose.prod.${VERSION}.yml
+```
+
+This creates `docker-compose.prod.v1.0.0.yml` that uses the stable `v1.0.0` image instead of the `main` branch.
+
+### Branch vs Release Strategy
+
+- **Branch-based** (`:main`): Latest development version, updated on every push
+- **Release-based** (`:v1.0.0`): Stable, immutable versions for production
+
+Use branch-based for development/testing, release-based for production stability.
