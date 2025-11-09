@@ -5,6 +5,7 @@ REST API routes for get_passage feature
 import logging
 from fastapi import APIRouter, HTTPException
 
+from core.utils import load_instruction
 from mcp_bible.bible_service import BibleService
 from mcp_bible.features.get_passage.models import GetPassageRequest, GetPassageResponse
 from mcp_bible.shared.models import ErrorResponse
@@ -27,24 +28,15 @@ def create_router(bible_service: BibleService) -> APIRouter:
     @router.post(
         "",
         response_model=GetPassageResponse,
+        summary="Get Bible Passage",
+        description=load_instruction("instructions.md", __file__),
         responses={
             400: {"model": ErrorResponse},
             500: {"model": ErrorResponse}
         }
     )
     async def get_passage_endpoint(request: GetPassageRequest):
-        """
-        Get a Bible passage
-
-        Args:
-            request: Passage request with reference and version
-
-        Returns:
-            Passage result
-
-        Raises:
-            HTTPException: 400 for validation errors, 500 for service errors
-        """
+        """Get a Bible passage using the comprehensive documentation from instructions.md"""
         try:
             result = await bible_service.fetch_passage(
                 passage=request.passage,

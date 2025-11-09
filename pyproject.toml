@@ -7,8 +7,6 @@ authors = [
     {name = "Geovanny F. Fajardo", email = "gffajardo@gmail.com"},
 ]
 dependencies = [
-    # Install mcp-weather from GitHub to get the core infrastructure
-    "mcp-weather @ git+https://github.com/geosp/mcp-weather.git",
     # Web scraping and HTTP client
     "httpx>=0.25.0",
     "beautifulsoup4>=4.12.0",
@@ -20,6 +18,7 @@ dependencies = [
     # This creates an editable install that reflects your local changes
     # Alternative: Install from PyPI (once published)
     # "mcp-weather>=0.1.0",
+    "mcp-weather",
 ]
 
 [project.scripts]
@@ -31,3 +30,6 @@ build-backend = "hatchling.build"
 
 [tool.hatch.metadata]
 allow-direct-references = true
+
+[tool.uv.sources]
+mcp-weather = { git = "https://github.com/geosp/mcp-weather.git" }

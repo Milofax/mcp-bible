@@ -8,6 +8,7 @@ import logging
 from typing import Dict, Any
 
 from fastmcp import FastMCP
+from core.utils import inject_docstring, load_instruction
 
 from mcp_bible.bible_service import BibleService
 from mcp_bible.features.get_passage.models import GetPassageRequest, GetPassageResponse
@@ -24,54 +25,9 @@ def register_tool(mcp: FastMCP, bible_service: BibleService) -> None:
         bible_service: BibleService instance for Bible operations
     """
     @mcp.tool()
+    @inject_docstring(lambda: load_instruction("instructions.md", __file__))
     async def get_passage(passage: str, version: str = "ESV") -> Dict[str, Any]:
-        """
-        Get a Bible passage from BibleGateway.com
-
-        This tool enables AI assistants to retrieve Bible passages for users.
-        It supports multiple Bible translations and provides clean, formatted text.
-
-        Use this tool when users ask questions like:
-        - "Show me John 3:16"
-        - "What does Romans 8 say?"
-        - "Read Psalm 23 in NIV"
-        - "Get the text of Genesis 1"
-        - "Show me John 3:16 and Romans 8:28"
-
-        Features:
-        - Support for 8+ Bible translations
-        - Automatic HTML parsing and cleaning
-        - Error handling for invalid passages
-        - Footnotes and cross-references removed
-        - Multiple passages supported (separate with semicolons)
-
-        Args:
-            passage (str): Bible reference(s) to retrieve
-                Examples: "John 3:16", "Romans 8:28-30", "Psalm 23", "Genesis 1:1-10"
-                Multiple: "John 3:16; Romans 8:28; Psalm 23:1-6"
-
-            version (str, optional): Bible translation version
-                Default: "ESV" (English Standard Version)
-                Supported: ESV, NIV, KJV, NASB, NKJV, NLT, AMP, MSG
-
-        Returns:
-            dict: Passage result containing:
-                - success: Whether the request succeeded
-                - passage: The requested reference
-                - version: The Bible version used
-                - text: The passage text (if successful)
-                - error: Error message (if failed)
-
-        Raises:
-            ValueError: If passage reference is invalid or version is unsupported
-
-        Example Usage (in AI conversation):
-            User: "Show me John 3:16"
-
-            AI calls: get_passage("John 3:16")
-
-            AI responds: "Here's John 3:16 from the ESV: 'For God so loved the world, that he gave his only Son, that whoever believes in him should not perish but have eternal life.'"
-        """
+        """Get a Bible passage with comprehensive documentation loaded from instructions.md"""
         try:
             logger.info(f"MCP tool called: get_passage(passage='{passage}', version='{version}')")
 

@@ -180,16 +180,94 @@ class BibleMCPServer(BaseMCPServer):
 
 def main():
     """
-    Main entry point for the Bible server
+    Main entry point for the Bible server with mode support
 
-    This shows the complete initialization flow:
-    1. Load configuration
-    2. Create services (cache, bible, MCP wrapper)
-    3. Create server
-    4. Run server
+    Supports three modes:
+    - stdio (default): MCP over stdin/stdout  
+    - mcp: MCP protocol over HTTP (no REST API)
+    - rest: Both REST API and MCP protocol over HTTP
+    
+    Usage:
+        mcp-bible                    # stdio mode (default)
+        mcp-bible --mode stdio       # stdio mode  
+        mcp-bible --mode mcp         # MCP-only over HTTP
+        mcp-bible --mode rest        # REST API + MCP over HTTP
     """
+    import argparse
+    import os
+    
     try:
-        # Load configuration from environment
+        # Create CLI parser with mode support
+        parser = argparse.ArgumentParser(
+            description="Bible MCP Server",
+            formatter_class=argparse.RawDescriptionHelpFormatter,
+            epilog="""
+Examples:
+  mcp-bible                         # Run with stdio transport (default)
+  mcp-bible --mode stdio            # Run with stdio transport
+  mcp-bible --mode mcp --port 3000  # Run MCP-only server on port 3000
+  mcp-bible --mode rest --port 3000 # Run REST API + MCP server on port 3000
+  
+Environment Variables:
+  MCP_TRANSPORT          Transport mode: stdio or http
+  MCP_HOST              Host to bind to for HTTP modes (default: 0.0.0.0)
+  MCP_PORT              Port to bind to for HTTP modes (default: 3000)
+  MCP_ONLY              true for MCP-only, false for REST+MCP
+  AUTH_ENABLED          Enable authentication for HTTP modes
+            """
+        )
+        
+        # Mode selection
+        parser.add_argument(
+            "--mode",
+            choices=["stdio", "mcp", "rest"],
+            default="stdio",
+            help="Server mode: stdio (default), mcp (HTTP MCP-only), or rest (HTTP with REST API + MCP)"
+        )
+        
+        # Host and port for HTTP modes
+        parser.add_argument(
+            "--host", 
+            default="0.0.0.0",
+            help="Host to bind to for HTTP modes (default: 0.0.0.0)"
+        )
+        
+        parser.add_argument(
+            "--port", 
+            type=int, 
+            default=3000,
+            help="Port to bind to for HTTP modes (default: 3000)"
+        )
+        
+        # Authentication control
+        parser.add_argument(
+            "--no-auth",
+            action="store_true",
+            help="Disable authentication for HTTP modes (not recommended for production)"
+        )
+        
+        args = parser.parse_args()
+        
+        # Apply CLI arguments to environment variables
+        if args.mode == "stdio":
+            os.environ["MCP_TRANSPORT"] = "stdio"
+            os.environ["MCP_ONLY"] = "true"
+        elif args.mode == "mcp":
+            os.environ["MCP_TRANSPORT"] = "http"
+            os.environ["MCP_ONLY"] = "true"
+            os.environ["MCP_HOST"] = args.host
+            os.environ["MCP_PORT"] = str(args.port)
+            if args.no_auth:
+                os.environ["AUTH_ENABLED"] = "false"
+        elif args.mode == "rest":
+            os.environ["MCP_TRANSPORT"] = "http"
+            os.environ["MCP_ONLY"] = "false"
+            os.environ["MCP_HOST"] = args.host
+            os.environ["MCP_PORT"] = str(args.port)
+            if args.no_auth:
+                os.environ["AUTH_ENABLED"] = "false"
+
+        # Load configuration from environment (after setting env vars)
         logger.info("Loading configuration...")
         config = get_config()
 
@@ -212,7 +290,7 @@ def main():
         server = BibleMCPServer(config, mcp_service)
 
         logger.info("Starting server...")
-        server.run()
+        server.run()  # Core framework handles mode detection from env vars
 
     except KeyboardInterrupt:
         logger.info("\nShutdown requested by user")
