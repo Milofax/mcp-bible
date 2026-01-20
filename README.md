@@ -22,6 +22,8 @@ The Bible MCP Server provides:
 - `GET /docs` - OpenAPI documentation (Swagger UI)
 
 ### Supported Bible Versions
+
+**English:**
 - ESV (English Standard Version)
 - NIV (New International Version)
 - KJV (King James Version)
@@ -30,6 +32,13 @@ The Bible MCP Server provides:
 - NLT (New Living Translation)
 - AMP (Amplified Bible)
 - MSG (The Message)
+
+**German (Deutsch):**
+- HOF (Hoffnung für Alle)
+- LUTH1545 (Luther Bibel 1545)
+- NGU-DE (Neue Genfer Übersetzung) - NT only
+- SCH1951 (Schlachter 1951)
+- SCH2000 (Schlachter 2000)
 
 ## Installation
 
@@ -134,6 +143,7 @@ Then ask Copilot:
 - "Show me John 3:16"
 - "What does Romans 8 say?"
 - "Read Psalm 23 in NIV"
+- "Zeige mir Johannes 3:16 auf Deutsch" (uses SCH2000 or HOF)
 
 ### Test the REST API
 
@@ -166,6 +176,22 @@ curl -X POST "http://localhost:3000/passage" \
   -d '{
     "passage": "Mark 2",
     "version": "ESV"
+  }'
+
+# Get a German passage (Schlachter 2000)
+curl -X POST "http://localhost:3000/passage" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "passage": "Johannes 3:16",
+    "version": "SCH2000"
+  }'
+
+# Get a German passage (Hoffnung für Alle)
+curl -X POST "http://localhost:3000/passage" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "passage": "Psalm 23",
+    "version": "HOF"
   }'
 ```
 
@@ -432,7 +458,7 @@ uv sync  # Installs from pyproject.toml
 ✅ **CLI interface** with comprehensive help  
 ✅ **Dynamic documentation** using core.utils  
 ✅ **Bible passage retrieval** from BibleGateway.com  
-✅ **8 Bible translations** supported  
+✅ **13 Bible translations** supported (8 English + 5 German)  
 ✅ **Multiple passage support** (semicolon-separated)  
 ✅ **Comprehensive test suite** with mode testing  
 ✅ **REST API examples** and curl scripts  

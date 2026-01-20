@@ -34,7 +34,16 @@ class BibleAPIConfig(BaseModel):
         description="Default Bible version"
     )
     supported_versions: List[str] = Field(
-        default=["ESV", "NIV", "KJV", "NASB", "NKJV", "NLT", "AMP", "MSG"],
+        default=[
+            # English versions
+            "ESV", "NIV", "KJV", "NASB", "NKJV", "NLT", "AMP", "MSG",
+            # German versions
+            "HOF",       # Hoffnung für Alle
+            "LUTH1545",  # Luther Bibel 1545
+            "NGU-DE",    # Neue Genfer Übersetzung (NT only)
+            "SCH1951",   # Schlachter 1951
+            "SCH2000",   # Schlachter 2000
+        ],
         description="List of supported Bible versions"
     )
     timeout: float = Field(
